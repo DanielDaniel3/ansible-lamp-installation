@@ -1,0 +1,9 @@
+---
+- name: Déploiement de la stack LAMP
+  hosts: workrocky
+  remote_user: ansible
+  become: yes 
+  
+  roles:
+    - role: lamp
+...

@@ -1,0 +1,96 @@
+---
+# tasks file for lamp
+- name: Installation du package apache 
+  ansible.builtin.dnf:
+    name: httpd,php,php-mysqli
+    state: latest
+
+- name: Démarrer le service apache  
+  ansible.builtin.systemd:
+    name: httpd
+    state: started
+
+- name: Autoriser le traffic http sur le serveur
+  ansible.posix.firewalld:
+    service: http
+    permanent: true
+    state: enabled
+  tags:
+    - firewall
+
+- name: Autoriser le traffic https sur le serveur
+  ansible.posix.firewalld:
+    service: https
+    permanent: true
+    state: enabled
+  tags:
+    - firewall
+
+- name: Rédemarrer le service firewalld 
+  ansible.builtin.systemd:
+    name: firewalld
+    state: restarted
+  tags: 
+    - firewall 
+
+- name: Installation de MariaDB
+  ansible.builtin.dnf:
+    name: mariadb-server
+    state: latest
+
+- name: Démarrer le service  MariaDB   
+  ansible.builtin.systemd:
+    name: mariadb
+    state: started
+
+#- name: Installation MySQL-python
+#  yum:
+#    name:
+#      - python3-pip
+      #- PyMySQL
+      #- mysqlclient
+#      - python(abi)
+#      - python3-cryptography
+#      - python3-PyMySQL-0.10.1-6.el9.noarch.rpm
+#    state: present
+#  tags: 
+#    - mariadb
+
+#- name: Création de la BD 'testdb'
+#  community.mysql.mysql_db:
+#    name: testdb
+#    state: present
+#    login_unix_socket: /run/mysqld/mysqld.sock
+#  tags: 
+#    - mariadb
+
+#- name: Création de l'utilisateur with 'devops' avec tous les privilèges
+#  community.mysql.mysql_user:
+#    name: devops
+#    password: devops12345
+#    priv: '*.*:ALL'
+#    state: present
+#  tags: 
+#    - mariadb
+#- name: Installation de PHP et ses extensions 
+
+- name: Installation de php et de ses dépendances 
+  ansible.builtin.dnf:
+    name:
+      - php
+      - php-cli
+      - php-gd
+      - php-curl
+      - php-zip
+      - php-mbstring
+      - php-mysqlnd
+    state: present
+  tags: 
+    - php
+
+- name: Redémarrer le service apache
+  ansible.builtin.systemd:
+    name: httpd
+    state: restarted
+  tags: 
+    - php 
